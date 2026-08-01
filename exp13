@@ -1,26 +1,65 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#define N 5
+
+pthread_mutex_t fork_mutex[N];
+
+void *philosopher(void *num)
+{
+    int id = *(int *)num;
+
+    printf("Philosopher %d is Thinking\n", id);
+
+    sleep(1);
+
+    pthread_mutex_lock(&fork_mutex[id]);
+    printf("Philosopher %d picked up Left Fork %d\n", id, id);
+
+    pthread_mutex_lock(&fork_mutex[(id + 1) % N]);
+    printf("Philosopher %d picked up Right Fork %d\n", id, (id + 1) % N);
+
+    printf("Philosopher %d is Eating\n", id);
+
+    sleep(1);
+
+    pthread_mutex_unlock(&fork_mutex[id]);
+    printf("Philosopher %d put down Left Fork %d\n", id, id);
+
+    pthread_mutex_unlock(&fork_mutex[(id + 1) % N]);
+    printf("Philosopher %d put down Right Fork %d\n", id, (id + 1) % N);
+
+    printf("Philosopher %d finished Eating\n\n", id);
+
+    pthread_exit(NULL);
+}
 
 int main()
 {
-    int i;
+    pthread_t thread[N];
+    int id[N];
 
-    printf("Dining Philosophers Problem Simulation\n\n");
-
-    for(i=1;i<=5;i++)
+    for (int i = 0; i < N; i++)
     {
-        printf("Philosopher %d is Thinking\n",i);
+        pthread_mutex_init(&fork_mutex[i], NULL);
+    }
 
-        printf("Philosopher %d picks Left Fork\n",i);
+    for (int i = 0; i < N; i++)
+    {
+        id[i] = i;
+        pthread_create(&thread[i], NULL, philosopher, &id[i]);
+    }
 
-        printf("Philosopher %d picks Right Fork\n",i);
+    for (int i = 0; i < N; i++)
+    {
+        pthread_join(thread[i], NULL);
+    }
 
-        printf("Philosopher %d is Eating\n",i);
-
-        printf("Philosopher %d puts Left Fork\n",i);
-
-        printf("Philosopher %d puts Right Fork\n",i);
-
-        printf("\n");
+    for (int i = 0; i < N; i++)
+    {
+        pthread_mutex_destroy(&fork_mutex[i]);
     }
 
     return 0;
