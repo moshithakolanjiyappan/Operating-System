@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int main()
+{
+    int i;
+
+    printf("Dining Philosophers Problem Simulation\n\n");
+
+    for(i=1;i<=5;i++)
+    {
+        printf("Philosopher %d is Thinking\n",i);
+
+        printf("Philosopher %d picks Left Fork\n",i);
+
+        printf("Philosopher %d picks Right Fork\n",i);
+
+        printf("Philosopher %d is Eating\n",i);
+
+        printf("Philosopher %d puts Left Fork\n",i);
+
+        printf("Philosopher %d puts Right Fork\n",i);
+
+        printf("\n");
+    }
+
+    return 0;
+}
