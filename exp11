@@ -1,44 +1,21 @@
 #include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <string.h>
-#include <stdlib.h>
+#include <pthread.h>
 
-struct msg_buffer
+void *display(void *arg)
 {
-    long msg_type;
-    char msg_text[100];
-} message;
+    printf("Thread is running...\n");
+    return NULL;
+}
 
 int main()
 {
-    key_t key;
-    int msgid;
+    pthread_t t;
 
-    key = ftok("progfile", 65);
+    pthread_create(&t, NULL, display, NULL);
 
-    msgid = msgget(key, 0666 | IPC_CREAT);
+    pthread_join(t, NULL);
 
-    if(msgid == -1)
-    {
-        printf("Message Queue Creation Failed\n");
-        exit(1);
-    }
-
-    message.msg_type = 1;
-
-    printf("Enter Message: ");
-    fgets(message.msg_text, sizeof(message.msg_text), stdin);
-
-    msgsnd(msgid, &message, sizeof(message.msg_text), 0);
-
-    printf("\nMessage Sent Successfully.\n");
-
-    msgrcv(msgid, &message, sizeof(message.msg_text), 1, 0);
-
-    printf("Received Message: %s", message.msg_text);
-
-    msgctl(msgid, IPC_RMID, NULL);
+    printf("Main Thread Finished.\n");
 
     return 0;
 }
