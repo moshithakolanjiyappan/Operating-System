@@ -1,41 +1,66 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 
-void *thread1(void *arg)
+#define N 5
+
+pthread_mutex_t fork_mutex[N];
+
+void *philosopher(void *num)
 {
-    int i;
+    int id = *(int *)num;
 
-    for(i=1;i<=5;i++)
-    {
-        printf("Thread 1 : %d\n",i);
-    }
+    printf("Philosopher %d is Thinking\n", id);
 
-    pthread_exit(NULL);
-}
+    sleep(1);
 
-void *thread2(void *arg)
-{
-    int i;
+    pthread_mutex_lock(&fork_mutex[id]);
+    printf("Philosopher %d picked up Left Fork %d\n", id, id);
 
-    for(i=1;i<=5;i++)
-    {
-        printf("Thread 2 : %d\n",i);
-    }
+    pthread_mutex_lock(&fork_mutex[(id + 1) % N]);
+    printf("Philosopher %d picked up Right Fork %d\n", id, (id + 1) % N);
+
+    printf("Philosopher %d is Eating\n", id);
+
+    sleep(1);
+
+    pthread_mutex_unlock(&fork_mutex[id]);
+    printf("Philosopher %d put down Left Fork %d\n", id, id);
+
+    pthread_mutex_unlock(&fork_mutex[(id + 1) % N]);
+    printf("Philosopher %d put down Right Fork %d\n", id, (id + 1) % N);
+
+    printf("Philosopher %d finished Eating\n\n", id);
 
     pthread_exit(NULL);
 }
 
 int main()
 {
-    pthread_t t1,t2;
+    pthread_t thread[N];
+    int id[N];
 
-    pthread_create(&t1,NULL,thread1,NULL);
-    pthread_create(&t2,NULL,thread2,NULL);
+    for (int i = 0; i < N; i++)
+    {
+        pthread_mutex_init(&fork_mutex[i], NULL);
+    }
 
-    pthread_join(t1,NULL);
-    pthread_join(t2,NULL);
+    for (int i = 0; i < N; i++)
+    {
+        id[i] = i;
+        pthread_create(&thread[i], NULL, philosopher, &id[i]);
+    }
 
-    printf("Threads Executed Successfully\n");
+    for (int i = 0; i < N; i++)
+    {
+        pthread_join(thread[i], NULL);
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        pthread_mutex_destroy(&fork_mutex[i]);
+    }
 
     return 0;
 }
