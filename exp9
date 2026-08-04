@@ -1,38 +1,50 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <unistd.h>
+#include <sys/types.h>
 
 int main()
 {
-    key_t key = 1234;
+    key_t key;
     int shmid;
-    char *data;
+    char *shared_memory;
 
-    // Create shared memory
-    shmid = shmget(key, 1024, 0666 | IPC_CREAT);
+    // Generate a unique key
+    key = ftok(".", 'A');
 
-    if (shmid < 0)
+    // Create shared memory segment
+    shmid = shmget(key, 1024, IPC_CREAT | 0666);
+
+    if (shmid == -1)
     {
-        printf("Shared memory creation failed.\n");
+        printf("Error creating shared memory.\n");
         return 1;
     }
 
     // Attach shared memory
-    data = (char *)shmat(shmid, NULL, 0);
+    shared_memory = (char *)shmat(shmid, NULL, 0);
 
-    printf("Enter a message: ");
-    scanf(" %[^\n]", data);
+    if (shared_memory == (char *)-1)
+    {
+        printf("Error attaching shared memory.\n");
+        return 1;
+    }
 
-    printf("\nMessage written to shared memory: %s\n", data);
+    // Write data
+    printf("Enter the message: ");
+    scanf(" %[^\n]", shared_memory);
 
-    printf("Message read from shared memory: %s\n", data);
+    printf("\nData Written : %s\n", shared_memory);
+
+    // Read data
+    printf("Data Read    : %s\n", shared_memory);
 
     // Detach shared memory
-    shmdt(data);
+    shmdt(shared_memory);
 
-    // Delete shared memory
+    // Remove shared memory
     shmctl(shmid, IPC_RMID, NULL);
 
     return 0;
