@@ -1,70 +1,32 @@
 #include <stdio.h>
-#include <pthread.h>
-#include <semaphore.h>
 
-#define MAX 10
+int main() {
+    int bufferSize, item;
+    int full = 0, empty, mutex = 1;
 
-int buffer[MAX];
-int in = 0, out = 0;
-int item, size;
+    printf("Enter buffer size: ");
+    scanf("%d", &bufferSize);
 
-sem_t empty, full, mutex;
+    empty = bufferSize;
 
-void *producer(void *arg)
-{
     printf("Enter item to produce: ");
     scanf("%d", &item);
 
-    sem_wait(&empty);
-    sem_wait(&mutex);
+    if(mutex==1 && empty!=0){
+        mutex=0;
+        empty--;
+        full++;
+        printf("Producer produced: %d\n",item);
+        mutex=1;
+    }
 
-    buffer[in] = item;
-    printf("Producer produced: %d\n", item);
-    in = (in + 1) % size;
-
-    sem_post(&mutex);
-    sem_post(&full);
-
-    return NULL;
-}
-
-void *consumer(void *arg)
-{
-    int consumed;
-
-    sem_wait(&full);
-    sem_wait(&mutex);
-
-    consumed = buffer[out];
-    printf("Consumer consumed: %d\n", consumed);
-    out = (out + 1) % size;
-
-    sem_post(&mutex);
-    sem_post(&empty);
-
-    return NULL;
-}
-
-int main()
-{
-    pthread_t p, c;
-
-    printf("Enter buffer size (Max 10): ");
-    scanf("%d", &size);
-
-    sem_init(&empty, 0, size);
-    sem_init(&full, 0, 0);
-    sem_init(&mutex, 0, 1);
-
-    pthread_create(&p, NULL, producer, NULL);
-    pthread_create(&c, NULL, consumer, NULL);
-
-    pthread_join(p, NULL);
-    pthread_join(c, NULL);
-
-    sem_destroy(&empty);
-    sem_destroy(&full);
-    sem_destroy(&mutex);
+    if(mutex==1 && full!=0){
+        mutex=0;
+        full--;
+        empty++;
+        printf("Consumer consumed: %d\n",item);
+        mutex=1;
+    }
 
     return 0;
 }
