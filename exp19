@@ -1,42 +1,41 @@
 #include <stdio.h>
 #include <pthread.h>
 
-pthread_mutex_t mutex;
 int counter = 0;
-int n;
+pthread_mutex_t lock;
 
 void *increment(void *arg)
 {
-    int i;
+    pthread_mutex_lock(&lock);
 
-    for(i = 0; i < n; i++)
-    {
-        pthread_mutex_lock(&mutex);
-        counter++;
-        pthread_mutex_unlock(&mutex);
-    }
+    counter++;
+    printf("Counter = %d\n", counter);
+
+    pthread_mutex_unlock(&lock);
 
     return NULL;
 }
 
 int main()
 {
-    pthread_t t1, t2;
+    int n, i;
 
-    printf("Enter number of increments: ");
+    printf("Enter number of threads: ");
     scanf("%d", &n);
 
-    pthread_mutex_init(&mutex, NULL);
+    pthread_t t[n];
 
-    pthread_create(&t1, NULL, increment, NULL);
-    pthread_create(&t2, NULL, increment, NULL);
+    pthread_mutex_init(&lock, NULL);
 
-    pthread_join(t1, NULL);
-    pthread_join(t2, NULL);
+    for(i=0;i<n;i++)
+        pthread_create(&t[i], NULL, increment, NULL);
 
-    printf("Final Counter Value = %d\n", counter);
+    for(i=0;i<n;i++)
+        pthread_join(t[i], NULL);
 
-    pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&lock);
+
+    printf("Final Counter = %d\n", counter);
 
     return 0;
 }
