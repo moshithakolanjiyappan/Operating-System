@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+int main() {
+    int readCount = 0;
+    int mutex = 1, wrt = 1;
+    int choice;
+
+    printf("1. Reader\n2. Writer\nEnter choice: ");
+    scanf("%d", &choice);
+
+    if (choice == 1) {
+        if (mutex == 1) {
+            mutex = 0;
+            readCount++;
+            if (readCount == 1)
+                wrt = 0;
+            mutex = 1;
+
+            printf("Reader is reading...\n");
+
+            mutex = 0;
+            readCount--;
+            if (readCount == 0)
+                wrt = 1;
+            mutex = 1;
+        }
+    } else if (choice == 2) {
+        if (wrt == 1) {
+            wrt = 0;
+            printf("Writer is writing...\n");
+            wrt = 1;
+        } else {
+            printf("Writer waiting...\n");
+        }
+    } else {
+        printf("Invalid choice\n");
+    }
+
+    return 0;
+}
