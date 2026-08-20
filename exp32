@@ -5,26 +5,21 @@ int main()
 {
     int request[50];
     int n, head, diskSize;
-    int direction;
     int i, j, temp;
     int total = 0;
 
     printf("Enter number of requests: ");
     scanf("%d", &n);
 
-    printf("Enter request queue:\n");
-
+    printf("\nEnter request queue:\n");
     for (i = 0; i < n; i++)
         scanf("%d", &request[i]);
 
-    printf("Enter initial head position: ");
+    printf("\nEnter initial head position: ");
     scanf("%d", &head);
 
-    printf("Enter disk size: ");
+    printf("\nEnter disk size: ");
     scanf("%d", &diskSize);
-
-    printf("Enter direction (1 = Right, 0 = Left): ");
-    scanf("%d", &direction);
 
     /* Sort request queue */
     for (i = 0; i < n - 1; i++)
@@ -43,68 +38,33 @@ int main()
     printf("\nSeek Sequence:\n");
     printf("%d", head);
 
-    if (direction == 1)
+    /* Move RIGHT */
+    for (i = 0; i < n; i++)
     {
-        /* Move right */
-        for (i = 0; i < n; i++)
+        if (request[i] > head)
         {
-            if (request[i] >= head)
-            {
-                total += abs(head - request[i]);
-                head = request[i];
-                printf(" -> %d", head);
-            }
-        }
-
-        /* Move to end */
-        if (head != diskSize - 1)
-        {
-            total += abs(head - (diskSize - 1));
-            head = diskSize - 1;
+            total += abs(head - request[i]);
+            head = request[i];
             printf(" -> %d", head);
-        }
-
-        /* Move left */
-        for (i = n - 1; i >= 0; i--)
-        {
-            if (request[i] < head)
-            {
-                total += abs(head - request[i]);
-                head = request[i];
-                printf(" -> %d", head);
-            }
         }
     }
-    else
+
+    /* Move to end of disk */
+    if (head != diskSize - 1)
     {
-        /* Move left */
-        for (i = n - 1; i >= 0; i--)
-        {
-            if (request[i] <= head)
-            {
-                total += abs(head - request[i]);
-                head = request[i];
-                printf(" -> %d", head);
-            }
-        }
+        total += (diskSize - 1) - head;
+        head = diskSize - 1;
+        printf(" -> %d", head);
+    }
 
-        /* Move to beginning */
-        if (head != 0)
+    /* Move LEFT */
+    for (i = n - 1; i >= 0; i--)
+    {
+        if (request[i] < head)
         {
-            total += head;
-            head = 0;
+            total += abs(head - request[i]);
+            head = request[i];
             printf(" -> %d", head);
-        }
-
-        /* Move right */
-        for (i = 0; i < n; i++)
-        {
-            if (request[i] > head)
-            {
-                total += abs(head - request[i]);
-                head = request[i];
-                printf(" -> %d", head);
-            }
         }
     }
 
