@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int request[50], n, head, disk_size;
+    int i, j, temp;
+    int total_seek = 0;
+    int current;
+
+    printf("Enter number of disk requests: ");
+    scanf("%d", &n);
+
+    printf("Enter disk requests:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &request[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter disk size: ");
+    scanf("%d", &disk_size);
+
+    /* Sort the requests */
+    for (i = 0; i < n - 1; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            if (request[i] > request[j])
+            {
+                temp = request[i];
+                request[i] = request[j];
+                request[j] = temp;
+            }
+        }
+    }
+
+    current = head;
+
+    printf("\nC-SCAN Disk Scheduling Order:\n");
+    printf("%d", current);
+
+    /* Move towards higher cylinder numbers */
+    for (i = 0; i < n; i++)
+    {
+        if (request[i] >= head)
+        {
+            total_seek += abs(current - request[i]);
+            current = request[i];
+            printf(" -> %d", current);
+        }
+    }
+
+    /* Move to end of disk */
+    total_seek += abs(current - (disk_size - 1));
+    current = disk_size - 1;
+    printf(" -> %d", current);
+
+    /* Jump from end to beginning */
+    total_seek += disk_size - 1;
+    current = 0;
+    printf(" -> %d", current);
+
+    /* Service remaining requests */
+    for (i = 0; i < n; i++)
+    {
+        if (request[i] < head)
+        {
+            total_seek += abs(current - request[i]);
+            current = request[i];
+            printf(" -> %d", current);
+        }
+    }
+
+    printf("\n\nTotal Head Movement = %d cylinders\n", total_seek);
+
+    return 0;
+}
