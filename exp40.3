@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <pthread.h>
+
+void *task(void *arg)
+{
+    pthread_t current = pthread_self();
+
+    printf("Thread is running.\n");
+
+    if (pthread_equal(current, *(pthread_t *)arg))
+        printf("Thread IDs are equal.\n");
+    else
+        printf("Thread IDs are not equal.\n");
+
+    return NULL;
+}
+
+int main()
+{
+    pthread_t thread;
+
+    pthread_create(&thread, NULL, task, &thread);
+
+    pthread_join(thread, NULL);
+
+    return 0;
+}
