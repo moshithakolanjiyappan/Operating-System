@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <sys/stat.h>
+
+void display_permissions(mode_t mode)
+{
+    printf("\nFile Permissions:\n");
+
+    printf("Owner : ");
+    printf("%c", (mode & S_IRUSR) ? 'r' : '-');
+    printf("%c", (mode & S_IWUSR) ? 'w' : '-');
+    printf("%c", (mode & S_IXUSR) ? 'x' : '-');
+
+    printf("\nGroup : ");
+    printf("%c", (mode & S_IRGRP) ? 'r' : '-');
+    printf("%c", (mode & S_IWGRP) ? 'w' : '-');
+    printf("%c", (mode & S_IXGRP) ? 'x' : '-');
+
+    printf("\nOthers: ");
+    printf("%c", (mode & S_IROTH) ? 'r' : '-');
+    printf("%c", (mode & S_IWOTH) ? 'w' : '-');
+    printf("%c", (mode & S_IXOTH) ? 'x' : '-');
+
+    printf("\n");
+}
+
+int main()
+{
+    struct stat file;
+
+    if (stat("sample.txt", &file) == -1)
+    {
+        printf("File not found.\n");
+        return 1;
+    }
+
+    printf("File: sample.txt\n");
+
+    printf("\nTypes of Linux Users:\n");
+    printf("1. Owner/User\n");
+    printf("2. Group\n");
+    printf("3. Others\n");
+
+    printf("\nPermission Types:\n");
+    printf("r - Read\n");
+    printf("w - Write\n");
+    printf("x - Execute\n");
+
+    display_permissions(file.st_mode);
+
+    return 0;
+}
