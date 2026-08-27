@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <pthread.h>
+
+void *task(void *arg)
+{
+    printf("Child thread is executing.\n");
+    return NULL;
+}
+
+int main()
+{
+    pthread_t thread;
+
+    pthread_create(&thread, NULL, task, NULL);
+
+    pthread_join(thread, NULL);
+
+    printf("Main thread continues after child thread finishes.\n");
+
+    return 0;
+}
