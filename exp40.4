@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <pthread.h>
+
+void *task(void *arg)
+{
+    printf("Child thread is running.\n");
+
+    pthread_exit(NULL);
+
+    printf("This statement will not execute.\n");
+
+    return NULL;
+}
+
+int main()
+{
+    pthread_t thread;
+
+    pthread_create(&thread, NULL, task, NULL);
+
+    pthread_join(thread, NULL);
+
+    printf("Child thread has exited.\n");
+
+    return 0;
+}
